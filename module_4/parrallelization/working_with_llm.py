@@ -76,6 +76,3 @@ graph = builder.compile()
 
 result = graph.invoke({"question": "Based on the current stock price of Intel, what is the Intel Stock price prediction in Q1 2026"})
 print(result["answer"].content)
-
-
-
