@@ -1,7 +1,8 @@
-from langchain_openai import ChatOpenAI
 from typing import TypedDict
 from pydantic import BaseModel, Field
 from langchain_core.messages import SystemMessage, HumanMessage
+from langgraph.graph import END
+from config import llm
 
 from dotenv import load_dotenv
 load_dotenv("../../.env")
@@ -48,3 +49,35 @@ analyst_instructions = """You are tasked with creating a set of AI analyst perso
 4. Pick the top {max_analysts} themes.
 
 5. Assign one analyst to each theme."""
+
+def create_analysts(state: GenerateAnalystsState):
+    """ Create analysts"""
+
+    topic = state["topic"]
+    max_analysts = state["max_analysts"]
+    human_analyst_feedback = state.get("human_analyst_feedback", "")
+
+    # enforce structured feedback
+    structured_llm = llm.with_structured_output(Perspectives)
+
+    system_message = analyst_instructions.format(topic=topic,
+                                                 human_analyst_feedback=human_analyst_feedback,
+                                                 max_analysts=max_analysts)
+    
+    # generate question
+    analysts = structured_llm.invoke([SystemMessage(content=system_message)] + [HumanMessage(content="Generate the set of analysts.")])
+
+    return {"analysts": analysts.analysts}
+
+def human_feedback(state: GenerateAnalystsState):
+    """ No-op node that should be interrupted on """
+
+def should_continue(state: GenerateAnalystsState):
+    """ Return the next node to execute """
+
+    # check if human feedback
+    human_analyst_feedback = state.get("human_analyst_feedback", None)
+    if human_analyst_feedback:
+        return "create_analysts"
+
+    return END
