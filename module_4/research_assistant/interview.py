@@ -58,7 +58,7 @@ def route_messages(state: InterviewState, name: str = "expert"):
     """ Route between question and answer """
 
     messages = state['messages']
-    max_num_turns = state['max_num_turns']
+    max_num_turns = state.get("max_num_turns", 2)
     
     # check the number of expert answers
     num_responses = len(
