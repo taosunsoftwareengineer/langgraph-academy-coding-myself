@@ -30,7 +30,7 @@ schema = result["responses"]
 print(schema)
 
 print("\n")
-print(schema[0].model_dump())
+print(schema[0].model_dump()) # {'user_name': 'Lance', 'interests': ['biking', 'San Francisco']}
 
 print("\n")
 print(result["response_metadata"])
